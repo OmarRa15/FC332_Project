@@ -11,7 +11,7 @@ app.config['SECRET_KEY'] = environ['SECRET_KEY']
 app.config['SQLALCHEMY_DATABASE_URI'] = environ['DATABASE_URL'][0:8] + 'ql' + environ['DATABASE_URL'][8:]
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 
-from sql_models import db, StdUsers
+from sql_models import db, User, StdUsers, AdvUsers
 from forms import StdLoginForm, StdRegisterForm
 
 loginManager = LoginManager()
@@ -20,9 +20,10 @@ loginManager.login_view = 'login'
 
 Bootstrap(app)
 
+
 @loginManager.user_loader
 def load_user(user_id):
-    return StdUsers.query.get(int(user_id))
+    return User.query.get(int(user_id))
 
 
 @app.route('/stdSignup', methods=['GET', 'POST'])

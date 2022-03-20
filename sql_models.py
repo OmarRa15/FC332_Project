@@ -6,7 +6,11 @@ from app import app
 db = SQLAlchemy(app)
 
 
-class AdvUsers(db.Model, UserMixin):
+class User(UserMixin):
+    pass
+
+
+class AdvUsers(db.Model, User):
     __tablename__ = "adv_users"
     id = db.Column(db.Integer, primary_key=True)
     first_name = db.Column(db.String(20))
@@ -28,7 +32,7 @@ class AdvUsers(db.Model, UserMixin):
         return 'ID: ' + str(self.id) + ' ' + self.first_name + ' ' + self.last_name
 
 
-class StdUsers(db.Model, UserMixin):
+class StdUsers(db.Model, User):
     __tablename__ = "std_users"
     id = db.Column(db.Integer, primary_key=True)
     first_name = db.Column(db.String(20))
