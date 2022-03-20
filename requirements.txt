@@ -25,3 +25,6 @@ psycopg2==2.9.3
 WTForms==3.0.1
 flask-wtf==1.0.0
 wtforms-sqlalchemy==0.3
+Flask-Bootstrap==3.3.7.1
+dominate==2.6.0
+visitor==0.1.3

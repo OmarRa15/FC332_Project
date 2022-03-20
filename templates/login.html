@@ -24,8 +24,8 @@ Login
         </div>
         <div id="navbar" class="collapse navbar-collapse">
           <ul class="nav navbar-nav">
-            <li class="active"><a href="{{ url_for('login') }}">Login</a></li>
-            <li><a href="{{ url_for('signup') }}">Sign Up</a></li>
+            <li class="active"><a href="{{ url_for('stdLogin') }}">Login</a></li>
+            <li><a href="{{ url_for('StdSignup') }}">Sign Up</a></li>
           </ul>
         </div><!--/.nav-collapse -->
       </div>
@@ -35,7 +35,7 @@ Login
 
 
 
-      <form class="form-signin" method="post" action="/login">
+      <form class="form-signin" method="post" action="/stdLogin">
 
         {% with messages = get_flashed_messages() %}
         {% if messages %}
@@ -48,11 +48,11 @@ Login
           <h4 style="color: red">{{ errorMsg }}</h4>
           {{ form.hidden_tag() }}
           {{ form.csrf_token }}
-          {{ wtf.form_field(form.username) }}
+          {{ wtf.form_field(form.studentID) }}
           {{ wtf.form_field(form.password) }}
           {{ wtf.form_field(form.remember) }}<br/>
-          <a href="{{ url_for('forgot') }}">Forgot Your Password?</a><br/><br/>
-          <a href="{{ url_for('signup') }}">don't have an account?<br/>sign up here!!</a><br/>
+{#          <a href="{{ url_for('forgot') }}">Forgot Your Password?</a><br/><br/>#}
+{#          <a href="{{ url_for('signup') }}">don't have an account?<br/>sign up here!!</a><br/>#}
           <button class="btn btn-lg btn-primary btn-block" type="submit">Sign in</button>
       </form>
 
