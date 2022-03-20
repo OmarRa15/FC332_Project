@@ -1,17 +1,17 @@
 astroid==2.4.2
 certifi==2021.10.8
-click @ file:///C:/ci/click_1646056799533/work
+click==8.0.4
 colorama==0.4.4
-Flask @ file:///tmp/build/80754af9/flask_1634118196080/work
+Flask==2.0.2
 isort==5.7.0
-itsdangerous @ file:///tmp/build/80754af9/itsdangerous_1621432558163/work
-Jinja2 @ file:///opt/conda/conda-bld/jinja2_1647436528585/work
+itsdangerous==2.0.1
+Jinja2==3.0.3
 lazy-object-proxy==1.4.3
-MarkupSafe @ file:///C:/ci/markupsafe_1621528314575/work
+MarkupSafe==2.0.1
 mccabe==0.6.1
 pylint==2.6.0
 six==1.15.0
 toml==0.10.2
-Werkzeug @ file:///opt/conda/conda-bld/werkzeug_1645628268370/work
+Werkzeug==2.0.3
 wincertstore==0.2
 wrapt==1.12.1
