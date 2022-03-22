@@ -40,12 +40,16 @@ Sign Up
     <h3 style = 'color: red'>{{ errorMsg }}</h3>
     {{ form.hidden_tag() }}
     {{ form.csrf_token }}
-    {{ wtf.form_field(form.first_name) }}
-    {{ wtf.form_field(form.last_name) }}
-    {{ wtf.form_field(form.std_id) }}
-    {{ wtf.form_field(form.password) }}
-    {{ wtf.form_field(form.confirm) }}
-    {{ wtf.form_field(form.advisor) }}
+    {% for field in form %}
+      {{ wtf.form_field(field) }}
+    {% endfor %}
+
+{#    {{ wtf.form_field(form.first_name) }}#}
+{#    {{ wtf.form_field(form.last_name) }}#}
+{#    {{ wtf.form_field(form.std_id) }}#}
+{#    {{ wtf.form_field(form.password) }}#}
+{#    {{ wtf.form_field(form.confirm) }}#}
+{#    {{ wtf.form_field(form.advisor) }}#}
 
     <a href="{{ url_for('stdLogin') }}">already have an account?<br/>login here!!</a><br/>
     <button class="btn btn-lg btn-primary btn-block" type="submit">Sign Up</button>

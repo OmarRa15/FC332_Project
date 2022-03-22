@@ -6,20 +6,30 @@ from app import app
 db = SQLAlchemy(app)
 
 
-class User(UserMixin):
-    pass
-
-
-class AdvUsers(db.Model, User):
-    __tablename__ = "adv_users"
+class User(db.Model, UserMixin):
+    __tablename__ = 'user'
     id = db.Column(db.Integer, primary_key=True)
     first_name = db.Column(db.String(20))
     last_name = db.Column(db.String(20))
-    email = db.Column(db.String(50), unique=True)
     password = db.Column(db.String(255))
     is_confirmed = db.Column(db.Boolean, default=True)
 
-    students = db.relationship("StdUsers", backref="adv_users")
+    type_ = db.Column(db.String(20))
+
+    __mapper_args__ = {
+        'polymorphic_on': type_,
+        'polymorphic_identity': 'user'
+    }
+
+
+class Advisor(User):
+    __tablename__ = "advisor"
+
+    email = db.Column(db.String(50), unique=True)
+
+    __mapper_args__ = {
+        'polymorphic_identity': 'advisor'
+    }
 
     def __init__(self, first_name, last_name, email, password, is_confirmed=True):
         self.first_name = first_name
@@ -29,51 +39,51 @@ class AdvUsers(db.Model, User):
         self.is_confirmed = is_confirmed
 
     def __repr__(self):
-        return 'ID: ' + str(self.id) + ' ' + self.first_name + ' ' + self.last_name
+        return str(self.email)
 
 
-class StdUsers(db.Model, User):
-    __tablename__ = "std_users"
-    id = db.Column(db.Integer, primary_key=True)
-    first_name = db.Column(db.String(20))
-    last_name = db.Column(db.String(20))
+class Student(User):
+    __tablename__ = "student"
+
     std_id = db.Column(db.Integer, unique=True)
-    password = db.Column(db.String(255))
-    is_confirmed = db.Column(db.Boolean, default=True)
-    advisor_id = db.Column(db.Integer, db.ForeignKey('adv_users.id'))
 
-    application = db.relationship('Applications', backref='StdUsers', uselist=False)
+    advisor_email = db.Column(db.String, db.ForeignKey(Advisor.email))
+    application = db.relationship('Application', backref='student', uselist=False)
+    advisor = db.relationship(Advisor, backref='student', remote_side=Advisor.email)
+    __mapper_args__ = {
+        'polymorphic_identity': 'student'
+    }
 
-    def __init__(self, first_name, last_name, std_id, password, advisor_id, is_confirmed=True):
+    def __init__(self, first_name, last_name, std_id, password, advisor_email, is_confirmed=True):
         self.first_name = first_name
         self.last_name = last_name
         self.std_id = std_id
         self.password = password
-        self.advisor_id = advisor_id
+        self.advisor_email = advisor_email
         self.is_confirmed = is_confirmed
 
     def __repr__(self):
         return 'StdID: ' + str(self.std_id) + ' ' + self.first_name + ' ' + self.last_name
 
 
-class Applications(db.Model):
-    __tablename__ = "applications"
+class Application(db.Model):
+    __tablename__ = "application"
 
-    student_id = db.Column(db.Integer, db.ForeignKey('std_users.std_id'), unique=True, primary_key=True)
+    student_id = db.Column(db.Integer, db.ForeignKey(Student.std_id), unique=True, primary_key=True)
     level = db.Column(db.SmallInteger)
     credits = db.Column(db.Integer)
     department = db.Column(db.String(50))
-    advisor = db.Column(db.Integer, db.ForeignKey('adv_users.id'))
+    advisor_email = db.Column(db.String(50))
     comment = db.Column(db.String(500))
     pending = db.Column(db.Boolean, default=True)
     approved = db.Column(db.Boolean, default=False)
 
-    def __init__(self, student_id, level, credits, department, advisor, comment, pending=True, approved=True):
+    def __init__(self, student_id, level, credits, department, advisor_email, comment, pending=True, approved=True):
         self.student_id = student_id
         self.level = level
         self.credits = credits
         self.department = department
-        self.advisor = advisor
+        self.advisor_email = advisor_email
         self.comment = comment
         self.pending = pending
         self.approved = approved

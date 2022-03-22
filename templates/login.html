@@ -35,7 +35,7 @@ Login
 
 
 
-      <form class="form-signin" method="post" action="/stdLogin">
+      <form class="form-signin" method="post" action="">
 
         {% with messages = get_flashed_messages() %}
         {% if messages %}
@@ -48,9 +48,10 @@ Login
           <h4 style="color: red">{{ errorMsg }}</h4>
           {{ form.hidden_tag() }}
           {{ form.csrf_token }}
-          {{ wtf.form_field(form.studentID) }}
-          {{ wtf.form_field(form.password) }}
-          {{ wtf.form_field(form.remember) }}<br/>
+            {% for field in form %}
+              {{ wtf.form_field(field) }}
+            {% endfor %}
+          <br/>
 {#          <a href="{{ url_for('forgot') }}">Forgot Your Password?</a><br/><br/>#}
 {#          <a href="{{ url_for('signup') }}">don't have an account?<br/>sign up here!!</a><br/>#}
           <button class="btn btn-lg btn-primary btn-block" type="submit">Sign in</button>
