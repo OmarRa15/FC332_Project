@@ -1,5 +1,5 @@
 from flask_wtf import FlaskForm
-from wtforms import StringField, PasswordField, BooleanField, IntegerField, SelectField
+from wtforms import StringField, PasswordField, BooleanField, IntegerField, SelectField, TextAreaField
 from wtforms.validators import InputRequired, Length, EqualTo, ValidationError, Email
 from werkzeug.security import check_password_hash
 from wtforms_sqlalchemy.fields import QuerySelectField
@@ -30,7 +30,7 @@ def advisorQuery():
 
 
 class StdRegisterForm(FlaskForm):
-    std_id = StringField('Student ID', validators=[InputRequired(), Length(min=7,max=8)])
+    std_id = StringField('Student ID', validators=[InputRequired(), Length(min=7, max=8)])
     password = PasswordField('Password', validators=[InputRequired(), Length(min=8, max=80),
                                                      EqualTo('confirm', message='Passwords must match')])
     confirm = PasswordField('Confirm_password', validators=[InputRequired(), Length(min=8, max=80)])
@@ -106,3 +106,12 @@ class ApplicationForm(FlaskForm):
 
         if not (0 < int(str(credits.data)) < 100):
             raise ValidationError("credits must be between 0 and 100.")
+
+
+class ViewApplicationForm(FlaskForm):
+    student_name = StringField('Student Name', render_kw={'readonly': True})
+    level = StringField('Level', render_kw={'readonly': True})
+    credits = StringField('Credits', render_kw={'readonly': True})
+    department = StringField('Department', render_kw={'readonly': True})
+    comment = TextAreaField('Your Comment:', validators=[InputRequired(), Length(max=500)])
+    approved = BooleanField('Approve')

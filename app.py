@@ -1,4 +1,4 @@
-from flask import Flask
+from flask import Flask, abort
 from os import environ
 from flask import render_template, redirect, url_for, flash
 from flask_login import login_user, login_required, current_user, logout_user, LoginManager
@@ -12,7 +12,7 @@ app.config['SQLALCHEMY_DATABASE_URI'] = environ['DATABASE_URL'][0:8] + 'ql' + en
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 
 from sql_models import db, User, Student, Advisor, Application
-from forms import StdLoginForm, StdRegisterForm, AdvRegisterForm, AdvLoginForm, ApplicationForm
+from forms import StdLoginForm, StdRegisterForm, AdvRegisterForm, AdvLoginForm, ApplicationForm, ViewApplicationForm
 
 loginManager = LoginManager()
 loginManager.init_app(app)
@@ -178,7 +178,43 @@ def advisor():
     name = current_user.first_name + " " + current_user.last_name
     email = current_user.email
 
-    return render_template('admin-dashboard.html',name=name, email=email,apps_num=apps_num, applications=applications  )
+    return render_template('admin-dashboard.html', name=name, email=email, apps_num=apps_num, applications=applications)
+
+
+@app.route('/viewApplication/<student_id>', methods=['GET', 'POST'])
+@login_required
+def viewApplication(student_id):
+    if current_user.type_ != 'advisor':
+        return abort(403)
+    application = Application.query.filter_by(student_id=student_id).first()
+    if not application:
+        return abort(404)
+    if application.advisor_email != current_user.email:
+        return abort(403)
+
+    form = ViewApplicationForm()
+
+    if form.validate_on_submit():
+        comment = form.comment.data
+        approved = form.approved.data
+
+        if approved:
+            # TODO  Send Approval Email with the comment.
+            db.session.delete(application)
+            db.session.commit()
+            return redirect('/advisor')
+        else:
+            # TODO Send Disapproval Email with the comment.
+            db.session.delete(application)
+            db.session.commit()
+            return redirect('/advisor')
+
+    form.student_name.data = application.student_name
+    form.level.data = application.level
+    form.credits.data = application.credits
+    form.department.data = application.department
+
+    return render_template('signup.html', form=form)
 
 
 @app.route('/logout')
