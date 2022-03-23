@@ -1,6 +1,6 @@
 from flask import Flask
 from os import environ
-from flask import render_template, redirect, url_for, flash, abort, request
+from flask import render_template, redirect, url_for, flash
 from flask_login import login_user, login_required, current_user, logout_user, LoginManager
 from werkzeug.security import generate_password_hash
 from flask_bootstrap import Bootstrap
@@ -11,8 +11,8 @@ app.config['SECRET_KEY'] = environ['SECRET_KEY']
 app.config['SQLALCHEMY_DATABASE_URI'] = environ['DATABASE_URL'][0:8] + 'ql' + environ['DATABASE_URL'][8:]
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 
-from sql_models import db, User, Student, Advisor
-from forms import StdLoginForm, StdRegisterForm, AdvRegisterForm, AdvLoginForm
+from sql_models import db, User, Student, Advisor, Application
+from forms import StdLoginForm, StdRegisterForm, AdvRegisterForm, AdvLoginForm, ApplicationForm
 
 loginManager = LoginManager()
 loginManager.init_app(app)
@@ -35,7 +35,7 @@ def stdSignup():
     if form.validate_on_submit():
         password = form.password.data
         hashedPass = generate_password_hash(password, method='sha256')
-        advisor_email = str(form.advisor.data)
+        advisor_email = str(form.advisor.data).lower()
         newUser = Student(first_name=form.first_name.data, last_name=form.last_name.data, password=hashedPass,
                           std_id=form.std_id.data, advisor_email=advisor_email)
 
@@ -78,7 +78,7 @@ def advSignup():
         hashedPass = generate_password_hash(password, method='sha256')
 
         newUser = Advisor(first_name=form.first_name.data, last_name=form.last_name.data, password=hashedPass,
-                          email=form.email.data)
+                          email=form.email.data.lower())
 
         db.session.add(newUser)
         db.session.commit()
@@ -94,7 +94,7 @@ def advLogin():
         return redirect('/test')
     form = AdvLoginForm()
     if form.validate_on_submit():
-        user = Advisor.query.filter_by(email=form.email.data).first()
+        user = Advisor.query.filter_by(email=form.email.data.lower()).first()
 
         # if not user.is_confirmed:
         #     return '<h1 style= "text-align: center">Your Email hasn\'t been confirmed yet,' \
@@ -129,6 +129,42 @@ def test():
     return str(current_user)
 
 
+@app.route('/apply', methods=['GET', 'POST'])
+@login_required
+def apply():
+    if current_user.type_ != 'student':
+        return redirect('test')
+
+    form = ApplicationForm()
+
+    application = current_user.application
+
+    if form.validate_on_submit():
+        department = form.department.data
+        level = form.level.data
+        credits = form.credits.data
+
+        if application is not None:
+            application.department = department
+            application.level = level
+            application.credits = credits
+
+            db.session.commit()
+            return str(application)
+
+        application = Application(student_id=current_user.std_id, level=level, department=department,
+                                  credits=credits, advisor_email=current_user.advisor_email)
+        db.session.add(application)
+        db.session.commit()
+        return str(application)
+
+    if application is not None:
+        form.department.data = application.department
+        form.level.data = application.level
+        form.credits.data = application.credits
+    return render_template('signup.html', form=form)
+
+
 @app.route('/logout')
 @login_required
 def logout():
@@ -137,4 +173,4 @@ def logout():
 
 
 if __name__ == '__main__':
-    app.run()
+    app.run(debug=True)

@@ -30,7 +30,7 @@ def advisorQuery():
 
 
 class StdRegisterForm(FlaskForm):
-    std_id = StringField('Student ID', validators=[InputRequired(), Length(max=50)])
+    std_id = StringField('Student ID', validators=[InputRequired(), Length(min=7,max=8)])
     password = PasswordField('Password', validators=[InputRequired(), Length(min=8, max=80),
                                                      EqualTo('confirm', message='Passwords must match')])
     confirm = PasswordField('Confirm_password', validators=[InputRequired(), Length(min=8, max=80)])
@@ -39,9 +39,9 @@ class StdRegisterForm(FlaskForm):
 
     advisor = QuerySelectField(query_factory=advisorQuery, allow_blank=False, get_label='email')
 
-    def validate_studentID(self, studentID):
+    def validate_std_id(self, studentID):
 
-        if not str(studentID).isnumeric() or not (7 < len(str(studentID)) < 10):
+        if not str(studentID.data).isnumeric():
             raise ValidationError("Incorrect ID format")
 
         user = Student.query.filter_by(std_id=studentID.data).first()
@@ -86,16 +86,23 @@ class AdvLoginForm(FlaskForm):
 
 
 class ApplicationForm(FlaskForm):
+    departments = ['Cyber Security']
     level = IntegerField('Level', validators=[InputRequired()])
     credits = IntegerField('Credits', validators=[InputRequired()])
-    department = SelectField('Department', choices=[], validators=[InputRequired()])
+    department = SelectField('Department', choices=departments, validators=[InputRequired()])
 
     def validate_level(self, level):
 
-        if not (0 < level < 9):
+        if not str(level.data).isnumeric():
+            raise ValidationError("level must be an integer between 1 and 8.")
+
+        if not (0 < int(str(level.data)) < 9):
             raise ValidationError("level must be between 1 and 8.")
 
     def validate_credits(self, credits):
 
-        if not (0 < credits < 100):
-            raise ValidationError("level must be between 1 and 8.")
+        if not str(credits.data).isnumeric():
+            raise ValidationError("credits must be an integer between 0 and 100.")
+
+        if not (0 < int(str(credits.data)) < 100):
+            raise ValidationError("credits must be between 0 and 100.")

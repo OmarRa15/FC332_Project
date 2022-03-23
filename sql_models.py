@@ -7,7 +7,7 @@ db = SQLAlchemy(app)
 
 
 class User(db.Model, UserMixin):
-    __tablename__ = 'user'
+    __tablename__ = 'users'
     id = db.Column(db.Integer, primary_key=True)
     first_name = db.Column(db.String(20))
     last_name = db.Column(db.String(20))
@@ -63,7 +63,7 @@ class Student(User):
         self.is_confirmed = is_confirmed
 
     def __repr__(self):
-        return 'StdID: ' + str(self.std_id) + ' ' + self.first_name + ' ' + self.last_name
+        return 'StdID: ' + str(self.std_id) + ' ' + self.first_name + ' ' + self.last_name + str(self.advisor_email)
 
 
 class Application(db.Model):
@@ -78,12 +78,15 @@ class Application(db.Model):
     pending = db.Column(db.Boolean, default=True)
     approved = db.Column(db.Boolean, default=False)
 
-    def __init__(self, student_id, level, credits, department, advisor_email, comment, pending=True, approved=True):
+    def __init__(self, student_id, level, credits, department, advisor_email, comment = '', pending=True, approved=False):
         self.student_id = student_id
         self.level = level
         self.credits = credits
         self.department = department
         self.advisor_email = advisor_email
         self.comment = comment
-        self.pending = pending
+        # self.pending = pending
         self.approved = approved
+
+    def __repr__(self):
+        return 'StdID: ' + str(self.student_id) + ' Advisor:' + str(self.advisor_email) + ' Cred' + str(self.credits)
