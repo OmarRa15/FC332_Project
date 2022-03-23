@@ -16,7 +16,7 @@ from forms import StdLoginForm, StdRegisterForm, AdvRegisterForm, AdvLoginForm
 
 loginManager = LoginManager()
 loginManager.init_app(app)
-loginManager.login_view = 'StdSignup'
+loginManager.login_view = 'landing'
 
 Bootstrap(app)
 
@@ -27,9 +27,9 @@ def load_user(user_id):
 
 
 @app.route('/stdSignup', methods=['GET', 'POST'])
-def StdSignup():
+def stdSignup():
     if current_user.is_authenticated:
-        return redirect('/')
+        return redirect('/test')
     form = StdRegisterForm()
 
     if form.validate_on_submit():
@@ -50,7 +50,7 @@ def StdSignup():
 @app.route('/stdLogin', methods=['GET', 'POST'])
 def stdLogin():
     if current_user.is_authenticated:
-        return redirect('/')
+        return redirect('/test')
     form = StdLoginForm()
     if form.validate_on_submit():
         user = Student.query.filter_by(std_id=form.studentID.data).first()
@@ -70,7 +70,7 @@ def stdLogin():
 @app.route('/advSignup', methods=['GET', 'POST'])
 def advSignup():
     if current_user.is_authenticated:
-        return redirect('/')
+        return redirect('/test')
     form = AdvRegisterForm()
 
     if form.validate_on_submit():
@@ -91,7 +91,7 @@ def advSignup():
 @app.route('/advLogin', methods=['GET', 'POST'])
 def advLogin():
     if current_user.is_authenticated:
-        return redirect('/')
+        return redirect('/test')
     form = AdvLoginForm()
     if form.validate_on_submit():
         user = Advisor.query.filter_by(email=form.email.data).first()
@@ -107,9 +107,20 @@ def advLogin():
     return render_template('login.html', form=form)
 
 
+temp_landing_page = f'''<body>
+<a href="/stdSignup" style= "text-align: center" > Student Signup </a> <br/>
+<a href="/stdLogin"  style= "text-align: center" > Student Login </a> <br/>
+<a href="/advSignup" style= "text-align: center" > Advisor Signup </a> <br/>
+<a href="/advLogin"  style= "text-align: center" > Advisor Login </a> <br/>
+<body/>
+'''
+
+
 @app.route('/')
-def hello_world():
-    return 'Hello World!'
+def landing():
+    if current_user.is_authenticated:
+        return redirect('/test')
+    return temp_landing_page
 
 
 @app.route('/test')

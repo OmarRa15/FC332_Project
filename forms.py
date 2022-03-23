@@ -1,5 +1,5 @@
 from flask_wtf import FlaskForm
-from wtforms import StringField, PasswordField, BooleanField
+from wtforms import StringField, PasswordField, BooleanField, IntegerField, SelectField
 from wtforms.validators import InputRequired, Length, EqualTo, ValidationError, Email
 from werkzeug.security import check_password_hash
 from wtforms_sqlalchemy.fields import QuerySelectField
@@ -8,7 +8,7 @@ from sql_models import Student, Advisor
 
 
 class StdLoginForm(FlaskForm):
-    studentID = StringField('Student ID', validators=[InputRequired(), Length(min=4, max=10)])
+    studentID = StringField('Student ID', validators=[InputRequired(), Length(min=7, max=8)])
     password = PasswordField('Password', validators=[InputRequired(), Length(min=8, max=80)])
     remember = BooleanField('Remember me')
 
@@ -83,3 +83,19 @@ class AdvLoginForm(FlaskForm):
             raise ValidationError('incorrect email or password')
         if not check_password_hash(user.password, self.password.data):
             raise ValidationError('incorrect username or password')
+
+
+class ApplicationForm(FlaskForm):
+    level = IntegerField('Level', validators=[InputRequired()])
+    credits = IntegerField('Credits', validators=[InputRequired()])
+    department = SelectField('Department', choices=[], validators=[InputRequired()])
+
+    def validate_level(self, level):
+
+        if not (0 < level < 9):
+            raise ValidationError("level must be between 1 and 8.")
+
+    def validate_credits(self, credits):
+
+        if not (0 < credits < 100):
+            raise ValidationError("level must be between 1 and 8.")
