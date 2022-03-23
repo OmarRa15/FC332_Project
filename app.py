@@ -152,8 +152,9 @@ def apply():
             db.session.commit()
             return str(application)
 
-        application = Application(student_id=current_user.std_id, level=level, department=department,
-                                  credits=credits, advisor_email=current_user.advisor_email)
+        student_name = current_user.first_name + ' ' + current_user.last_name
+        application = Application(student_id=current_user.std_id, student_name=student_name, level=level,
+                                  department=department, credits=credits, advisor_email=current_user.advisor_email)
         db.session.add(application)
         db.session.commit()
         return str(application)
@@ -163,6 +164,21 @@ def apply():
         form.level.data = application.level
         form.credits.data = application.credits
     return render_template('signup.html', form=form)
+
+
+@app.route('/advisor')
+@login_required
+def advisor():
+    if current_user.type_ != 'advisor':
+        return redirect('/test')
+
+    applications = Application.query.filter_by(advisor_email=current_user.email, approved=False).all()
+
+    apps_num = len(applications)
+    name = current_user.first_name + " " + current_user.last_name
+    email = current_user.email
+
+    return render_template('admin-dashboard.html',name=name, email=email,apps_num=apps_num, applications=applications  )
 
 
 @app.route('/logout')

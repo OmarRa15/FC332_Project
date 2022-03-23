@@ -70,6 +70,7 @@ class Application(db.Model):
     __tablename__ = "application"
 
     student_id = db.Column(db.Integer, db.ForeignKey(Student.std_id), unique=True, primary_key=True)
+    student_name = db.Column(db.String(50))
     level = db.Column(db.SmallInteger)
     credits = db.Column(db.Integer)
     department = db.Column(db.String(50))
@@ -78,8 +79,9 @@ class Application(db.Model):
     pending = db.Column(db.Boolean, default=True)
     approved = db.Column(db.Boolean, default=False)
 
-    def __init__(self, student_id, level, credits, department, advisor_email, comment = '', pending=True, approved=False):
+    def __init__(self, student_id,student_name, level, credits, department, advisor_email, comment = '', approved=False):
         self.student_id = student_id
+        self.student_name = student_name
         self.level = level
         self.credits = credits
         self.department = department
