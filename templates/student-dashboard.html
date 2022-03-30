@@ -103,7 +103,6 @@ Student Dashboard
                             <div class="card-info">
                                 <div class="card-head">
                                     <span>Status</span>
-                                    <small>Your current Status</small>
                                 </div>
 
                                 {% if application and application.pending %}
@@ -112,7 +111,8 @@ Student Dashboard
                                 {% endif %}
 
                                 {% if application and not application.pending %}
-                                    <h3>You have applied for the summer training, and your advisor has reviewed it</h3>
+                                    <h3>You have applied for the summer training, and your advisor has reviewed your
+                                        application</h3>
                                     {% if application.approved %}
                                     <small>Your advisor has approved your application, and left the following comment:</small><br/>
                                     {% endif %}

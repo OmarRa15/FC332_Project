@@ -47,7 +47,9 @@ def stdSignup():
 
         flash("Signed Up Successfully!!")
         return redirect(url_for('stdLogin'))
-    return render_template('signup.html', form=form)
+
+    links = {'Login': 'stdLogin', 'Signup': 'stdSignup'}
+    return render_template('formPage.html', form=form, links=links, Name='Sign Up')
 
 
 @app.route('/stdLogin', methods=['GET', 'POST'])
@@ -70,7 +72,8 @@ def stdLogin():
         login_user(user, remember=form.remember.data)
         return redirect('/student')
 
-    return render_template('login.html', form=form)
+    links = {'Login': 'stdLogin', 'Signup': 'stdSignup'}
+    return render_template('formPage.html', form=form, links=links, Name="Login")
 
 
 @app.route('/advSignup', methods=['GET', 'POST'])
@@ -95,7 +98,9 @@ def advSignup():
 
         flash("Signed Up Successfully!!")
         return redirect(url_for('advLogin'))
-    return render_template('signup.html', form=form)
+
+    links = {'Login': 'advLogin', 'Signup': 'advSignup'}
+    return render_template('formPage.html', form=form, links=links, Name='Sign Up')
 
 
 @app.route('/advLogin', methods=['GET', 'POST'])
@@ -116,7 +121,8 @@ def advLogin():
         login_user(user, remember=form.remember.data)
         return redirect(url_for('advisor'))
 
-    return render_template('login.html', form=form)
+    links = {'Login': 'advLogin', 'Signup': 'advSignup'}
+    return render_template('formPage.html', form=form, links=links, Name='Log in')
 
 
 @app.route('/student')
@@ -168,14 +174,15 @@ def apply():
         form.department.data = application.department
         form.level.data = application.level
         form.credits.data = application.credits
-    return render_template('signup.html', form=form)
+
+    return render_template('formPage.html', form=form, Name='Apply')
 
 
 @app.route('/advisor')
 @login_required
 def advisor():
     if current_user.type_ != 'advisor':
-        return redirect('/test')
+        return redirect('/student')
 
     applications = Application.query.filter_by(advisor_email=current_user.email, pending=True).all()
 
@@ -221,7 +228,7 @@ def viewApplication(student_id):
     form.credits.data = application.credits
     form.department.data = application.department
 
-    return render_template('signup.html', form=form)
+    return render_template('formPage.html', form=form, Name='Review')
 
 
 temp_landing_page = f'''<body>
@@ -240,6 +247,7 @@ def landing():
             return redirect('/student')
         elif current_user.type_ == 'advisor':
             return redirect('/advisor')
+
     return temp_landing_page
 
 
