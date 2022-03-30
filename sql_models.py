@@ -79,7 +79,8 @@ class Application(db.Model):
     pending = db.Column(db.Boolean, default=True)
     approved = db.Column(db.Boolean, default=False)
 
-    def __init__(self, student_id,student_name, level, credits, department, advisor_email, comment = '', approved=False):
+    def __init__(self, student_id, student_name, level, credits, department, advisor_email, comment='', approved=False,
+                 pending=True):
         self.student_id = student_id
         self.student_name = student_name
         self.level = level
@@ -87,7 +88,7 @@ class Application(db.Model):
         self.department = department
         self.advisor_email = advisor_email
         self.comment = comment
-        # self.pending = pending
+        self.pending = pending
         self.approved = approved
 
     def __repr__(self):
