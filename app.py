@@ -11,7 +11,7 @@ app.config['SECRET_KEY'] = environ['SECRET_KEY']
 app.config['SQLALCHEMY_DATABASE_URI'] = environ['DATABASE_URL'][0:8] + 'ql' + environ['DATABASE_URL'][8:]
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 
-from sql_models import db, User, Student, Advisor, Application
+from sql_models import db, User, Student, Advisor, Application, Administrator
 from forms import StdRegisterForm, AdvRegisterForm, ApplicationForm, ViewApplicationForm, LoginForm
 
 loginManager = LoginManager()
@@ -29,10 +29,8 @@ def load_user(user_id):
 @app.route('/stdSignup', methods=['GET', 'POST'])
 def stdSignup():
     if current_user.is_authenticated:
-        if current_user.type_ == 'student':
-            return redirect('/student')
-        elif current_user.type_ == 'advisor':
-            return redirect('/advisor')
+        return redirect('/' + current_user.type_)
+
     form = StdRegisterForm()
 
     if form.validate_on_submit():
@@ -55,10 +53,7 @@ def stdSignup():
 @app.route('/stdLogin', methods=['GET', 'POST'])
 def stdLogin():
     if current_user.is_authenticated:
-        if current_user.type_ == 'student':
-            return redirect('/student')
-        elif current_user.type_ == 'advisor':
-            return redirect('/advisor')
+        return redirect('/' + current_user.type_)
 
     form = LoginForm(Student)
     if form.validate_on_submit():
@@ -76,40 +71,10 @@ def stdLogin():
     return render_template('formPage.html', form=form, links=links, Name="Login")
 
 
-@app.route('/advSignup', methods=['GET', 'POST'])
-def advSignup():
-    if current_user.is_authenticated:
-        if current_user.type_ == 'student':
-            return redirect('/student')
-        elif current_user.type_ == 'advisor':
-            return redirect('/advisor')
-
-    form = AdvRegisterForm()
-
-    if form.validate_on_submit():
-        password = form.password.data
-        hashedPass = generate_password_hash(password, method='sha256')
-
-        newUser = Advisor(first_name=form.first_name.data, last_name=form.last_name.data, password=hashedPass,
-                          email=form.email.data.lower())
-
-        db.session.add(newUser)
-        db.session.commit()
-
-        flash("Signed Up Successfully!!")
-        return redirect(url_for('advLogin'))
-
-    links = {'Login': 'advLogin', 'Signup': 'advSignup'}
-    return render_template('formPage.html', form=form, links=links, Name='Sign Up')
-
-
 @app.route('/advLogin', methods=['GET', 'POST'])
 def advLogin():
     if current_user.is_authenticated:
-        if current_user.type_ == 'student':
-            return redirect('/student')
-        elif current_user.type_ == 'advisor':
-            return redirect('/advisor')
+        return redirect('/' + current_user.type_)
 
     form = LoginForm(Advisor)
     if form.validate_on_submit():
@@ -122,15 +87,14 @@ def advLogin():
         login_user(user, remember=form.remember.data)
         return redirect(url_for('advisor'))
 
-    links = {'Login': 'advLogin', 'Signup': 'advSignup'}
-    return render_template('formPage.html', form=form, links=links, Name='Log in')
+    return render_template('formPage.html', form=form, Name='Log in')
 
 
 @app.route('/student')
 @login_required
 def student():
     if current_user.type_ != 'student':
-        return redirect('/advisor')
+        return abort(403)
 
     name = current_user.first_name + ' ' + current_user.last_name
     email = str(current_user.std_id) + '@upm.edu.sa'
@@ -143,7 +107,7 @@ def student():
 @login_required
 def apply():
     if current_user.type_ != 'student':
-        return redirect('/advisor')
+        return abort(403)
 
     form = ApplicationForm()
 
@@ -183,7 +147,7 @@ def apply():
 @login_required
 def advisor():
     if current_user.type_ != 'advisor':
-        return redirect('/student')
+        return abort(403)
 
     applications = Application.query.filter_by(advisor_email=current_user.email, pending=True).all()
 
@@ -191,7 +155,8 @@ def advisor():
     name = current_user.first_name + " " + current_user.last_name
     email = current_user.email
 
-    return render_template('admin-dashboard.html', name=name, email=email, apps_num=apps_num, applications=applications)
+    return render_template('advisor-dashboard.html', name=name, email=email, apps_num=apps_num,
+                           applications=applications)
 
 
 @app.route('/viewApplication/<student_id>', methods=['GET', 'POST'])
@@ -232,10 +197,63 @@ def viewApplication(student_id):
     return render_template('formPage.html', form=form, Name='Review')
 
 
+@app.route('/adminLogin', methods=['GET', 'POST'])
+def adminLogin():
+    if current_user.is_authenticated:
+        return redirect('/' + current_user.type_)
+
+    form = LoginForm(Administrator)
+    if form.validate_on_submit():
+        user = Administrator.query.filter_by(email=form.email.data.lower()).first()
+        login_user(user, remember=form.remember.data)
+
+        return redirect(url_for('administrator'))
+
+    return render_template('formPage.html', form=form, Name='Log in')
+
+
+@app.route('/administrator')
+@login_required
+def administrator():
+    if current_user.type_ != 'administrator':
+        return abort(403)
+
+    studentsNum = len(Student.query.all())
+    advisorsNum = len(Advisor.query.all())
+
+    name = current_user.first_name + " " + current_user.last_name
+    email = current_user.email
+
+    return render_template('admin-dashboard.html', name=name, email=email, studentNum=studentsNum,
+                           advisorNum=advisorsNum)
+
+
+@app.route('/addAdvisor', methods=['GET', 'POST'])
+@login_required
+def addAdvisor():
+    if current_user.type_ != 'administrator':
+        return abort(403)
+
+    form = AdvRegisterForm()
+
+    if form.validate_on_submit():
+        password = form.password.data
+        hashedPass = generate_password_hash(password, method='sha256')
+
+        newUser = Advisor(first_name=form.first_name.data, last_name=form.last_name.data, password=hashedPass,
+                          email=form.email.data.lower())
+
+        db.session.add(newUser)
+        db.session.commit()
+
+        return redirect(url_for('administrator'))
+
+    return render_template('formPage.html', form=form, Name='Add Advisor')
+
+
 temp_landing_page = f'''<body>
 <a href="/stdSignup" style= "text-align: center" > Student Signup </a> <br/>
 <a href="/stdLogin"  style= "text-align: center" > Student Login </a> <br/>
-<a href="/advSignup" style= "text-align: center" > Advisor Signup </a> <br/>
 <a href="/advLogin"  style= "text-align: center" > Advisor Login </a> <br/>
 <body/>
 '''
@@ -244,10 +262,7 @@ temp_landing_page = f'''<body>
 @app.route('/')
 def landing():
     if current_user.is_authenticated:
-        if current_user.type_ == 'student':
-            return redirect('/student')
-        elif current_user.type_ == 'advisor':
-            return redirect('/advisor')
+        return redirect('/' + current_user.type_)
 
     return temp_landing_page
 
