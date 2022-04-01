@@ -114,4 +114,4 @@ class Application(db.Model):
         self.approved = approved
 
     def __repr__(self):
-        return 'StdID: ' + str(self.student_id) + ' Advisor:' + str(self.advisor_email) + ' Cred' + str(self.credits)
+        return 'StdID: ' + str(self.student_id) + ' Advisor:' + str(self.advisor_email)

@@ -112,8 +112,13 @@ def apply():
     form = ApplicationForm()
 
     application = current_user.application
-    if application and not application.pending:
-        return abort(403)
+    if application and application.approved:  # application has been approved
+        abort(403)
+
+    elif application and not application.pending:  # application has been denied => delete it and start a new one
+        db.session.delete(application)
+        db.session.commit()
+        application = None
 
     if form.validate_on_submit():
         department = form.department.data

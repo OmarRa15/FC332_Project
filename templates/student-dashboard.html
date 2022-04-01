@@ -35,25 +35,32 @@ Student Dashboard
                     <span>{{ email }}</span>
                 </div>
                </div>
-               <div class="sidebar-menu">
-                   <ul>
-                       <li>
-                           {% if  (application and application.pending == True) %}
-                               <a href="{{url_for('apply')}}">
-                                   <span class="las "></span>
-                                   Modify application
-                               </a>
-                           {%  endif %}
+                <div class="sidebar-menu">
+                    <ul>
+                        <li>
+                            {% if  (application and application.pending == True) %}
+                                <a href="{{ url_for('apply') }}">
+                                    <span class="las "></span>
+                                    Modify application
+                                </a>
+                            {% endif %}
+
+                            {% if  (application and (not application.pending) and (not application.approved)) %}
+                                <a href="{{ url_for('apply') }}">
+                                    <span class="las "></span>
+                                    create a new application
+                                </a>
+                            {% endif %}
 
                             {% if  (not application) %}
-                               <a href="{{url_for('apply')}}">
-                                   <span class="las "></span>
-                                   Apply For Summer Training
-                               </a>
-                           {%  endif %}
-                       </li>
-                   </ul>
-                   <div class="menu-head">
+                                <a href="{{ url_for('apply') }}">
+                                    <span class="las "></span>
+                                    Apply For Summer Training
+                                </a>
+                            {% endif %}
+                        </li>
+                    </ul>
+                    <div class="menu-head">
                     <span>Applications</span>
                 </div>
                 <ul>
