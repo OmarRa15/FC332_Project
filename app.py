@@ -119,18 +119,22 @@ def apply():
         department = form.department.data
         level = form.level.data
         credits = form.credits.data
+        company = form.training_company.data
+        description = form.description.data
 
         if application is not None:
             application.department = department
             application.level = level
             application.credits = credits
+            application.training_company = company
+            application.description = description
 
             db.session.commit()
             return redirect('/student')
 
         student_name = current_user.first_name + ' ' + current_user.last_name
-        application = Application(student_id=current_user.std_id, student_name=student_name, level=level,
-                                  department=department, credits=credits, advisor_email=current_user.advisor_email)
+        application = Application(current_user.std_id, student_name, level, credits, department, company, description,
+                                  current_user.advisor_email)
         db.session.add(application)
         db.session.commit()
         return redirect('/student')
@@ -139,6 +143,8 @@ def apply():
         form.department.data = application.department
         form.level.data = application.level
         form.credits.data = application.credits
+        form.training_company.data = application.training_company
+        form.description.data = application.description
 
     return render_template('formPage.html', form=form, Name='Apply')
 
@@ -193,6 +199,8 @@ def viewApplication(student_id):
     form.level.data = application.level
     form.credits.data = application.credits
     form.department.data = application.department
+    form.training_company.data = application.training_company
+    form.description.data = application.description
 
     return render_template('formPage.html', form=form, Name='Review')
 

@@ -77,6 +77,8 @@ class ApplicationForm(FlaskForm):
     level = IntegerField('Level', validators=[InputRequired()])
     credits = IntegerField('Credits', validators=[InputRequired()])
     department = SelectField('Department', choices=departments, validators=[InputRequired()])
+    training_company = StringField('training_company', validators=[InputRequired(), Length(min=5, max=50)])
+    description = TextAreaField('description:', validators=[InputRequired(), Length(max=500)])
 
     def validate_level(self, level):
 
@@ -100,5 +102,8 @@ class ViewApplicationForm(FlaskForm):
     level = StringField('Level', render_kw={'readonly': True})
     credits = StringField('Credits', render_kw={'readonly': True})
     department = StringField('Department', render_kw={'readonly': True})
+    training_company = StringField('training_company', render_kw={'readonly': True})
+    description = TextAreaField('description:', render_kw={'readonly': True})
+
     comment = TextAreaField('Your Comment:', validators=[InputRequired(), Length(max=500)])
     approved = BooleanField('Approve')

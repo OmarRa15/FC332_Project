@@ -92,18 +92,22 @@ class Application(db.Model):
     level = db.Column(db.SmallInteger)
     credits = db.Column(db.Integer)
     department = db.Column(db.String(50))
+    training_company = db.Column(db.String(50))
+    description = db.Column(db.String(500))
     advisor_email = db.Column(db.String(50))
     comment = db.Column(db.String(500))
     pending = db.Column(db.Boolean, default=True)
     approved = db.Column(db.Boolean, default=False)
 
-    def __init__(self, student_id, student_name, level, credits, department, advisor_email, comment='', approved=False,
-                 pending=True):
+    def __init__(self, student_id, student_name, level, credits, department, training_company, description,
+                 advisor_email, comment='', approved=False, pending=True):
         self.student_id = student_id
         self.student_name = student_name
         self.level = level
         self.credits = credits
         self.department = department
+        self.training_company = training_company
+        self.description = description
         self.advisor_email = advisor_email
         self.comment = comment
         self.pending = pending
