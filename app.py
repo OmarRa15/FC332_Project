@@ -12,7 +12,7 @@ app.config['SQLALCHEMY_DATABASE_URI'] = environ['DATABASE_URL'][0:8] + 'ql' + en
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 
 from sql_models import db, User, Student, Advisor, Application
-from forms import StdLoginForm, StdRegisterForm, AdvRegisterForm, AdvLoginForm, ApplicationForm, ViewApplicationForm
+from forms import StdRegisterForm, AdvRegisterForm, ApplicationForm, ViewApplicationForm, LoginForm
 
 loginManager = LoginManager()
 loginManager.init_app(app)
@@ -60,9 +60,9 @@ def stdLogin():
         elif current_user.type_ == 'advisor':
             return redirect('/advisor')
 
-    form = StdLoginForm()
+    form = LoginForm(Student)
     if form.validate_on_submit():
-        user = Student.query.filter_by(std_id=form.studentID.data).first()
+        user = Student.query.filter_by(email=form.email.data.lower()).first()
 
         # if not user.is_confirmed:
         #     return '<h1 style= "text-align: center">Your Email hasn\'t been confirmed yet,' \
@@ -110,7 +110,8 @@ def advLogin():
             return redirect('/student')
         elif current_user.type_ == 'advisor':
             return redirect('/advisor')
-    form = AdvLoginForm()
+
+    form = LoginForm(Advisor)
     if form.validate_on_submit():
         user = Advisor.query.filter_by(email=form.email.data.lower()).first()
 

@@ -7,17 +7,19 @@ from wtforms_sqlalchemy.fields import QuerySelectField
 from sql_models import Student, Advisor
 
 
-class StdLoginForm(FlaskForm):
-    studentID = StringField('Student ID', validators=[InputRequired(), Length(min=7, max=8)])
+class LoginForm(FlaskForm):
+    email = StringField('email', validators=[InputRequired(), Length(min=7, max=50),
+                                             Email(message='Invalid email', check_deliverability=True)])
     password = PasswordField('Password', validators=[InputRequired(), Length(min=8, max=80)])
     remember = BooleanField('Remember me')
 
-    def validate_studentID(self, studentID):
+    def __init__(self, modelName):
+        super().__init__()
+        self.modelName = modelName
 
-        if not str(studentID.data).isnumeric():
-            raise ValidationError("Incorrect ID format")
+    def validate_email(self, email):
 
-        user = Student.query.filter_by(std_id=studentID.data).first()
+        user = self.modelName.query.filter_by(email=email.data).first()
 
         if not user:
             raise ValidationError('incorrect username or password')
@@ -31,11 +33,12 @@ def advisorQuery():
 
 class StdRegisterForm(FlaskForm):
     std_id = StringField('Student ID', validators=[InputRequired(), Length(min=7, max=8)])
+    first_name = StringField('First Name', validators=[InputRequired(), Length(min=3, max=20)])
+    last_name = StringField('Last Name', validators=[InputRequired(), Length(min=3, max=20)])
+
     password = PasswordField('Password', validators=[InputRequired(), Length(min=8, max=80),
                                                      EqualTo('confirm', message='Passwords must match')])
     confirm = PasswordField('Confirm_password', validators=[InputRequired(), Length(min=8, max=80)])
-    first_name = StringField('First Name', validators=[InputRequired(), Length(min=3, max=20)])
-    last_name = StringField('Last Name', validators=[InputRequired(), Length(min=3, max=20)])
 
     advisor = QuerySelectField(query_factory=advisorQuery, allow_blank=False, get_label='email')
 
@@ -67,22 +70,6 @@ class AdvRegisterForm(FlaskForm):
         user = Advisor.query.filter_by(email=email.data.lower()).first()
         if user:
             raise ValidationError('email already exists')
-
-
-class AdvLoginForm(FlaskForm):
-    email = StringField('Email', validators=[InputRequired(), Email(message='Invalid email', check_deliverability=True),
-                                             Length(max=50)])
-    password = PasswordField('Password', validators=[InputRequired(), Length(min=8, max=80)])
-    remember = BooleanField('Remember me')
-
-    def validate_email(self, email):
-
-        user = Advisor.query.filter_by(email=email.data.lower()).first()
-
-        if not user:
-            raise ValidationError('incorrect email or password')
-        if not check_password_hash(user.password, self.password.data):
-            raise ValidationError('incorrect username or password')
 
 
 class ApplicationForm(FlaskForm):

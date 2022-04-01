@@ -9,6 +9,7 @@ db = SQLAlchemy(app)
 class User(db.Model, UserMixin):
     __tablename__ = 'users'
     id = db.Column(db.Integer, primary_key=True)
+    email = db.Column(db.String(50), unique=True)
     first_name = db.Column(db.String(20))
     last_name = db.Column(db.String(20))
     password = db.Column(db.String(255))
@@ -22,10 +23,26 @@ class User(db.Model, UserMixin):
     }
 
 
+class Administrator(User):
+    __tablename__ = "administrator"
+
+    __mapper_args__ = {
+        'polymorphic_identity': 'administrator'
+    }
+
+    def __init__(self, first_name, last_name, email, password):
+        self.first_name = first_name
+        self.last_name = last_name
+        self.email = email
+        self.password = password
+        self.is_confirmed = True
+
+    def __repr__(self):
+        return str(self.email)
+
+
 class Advisor(User):
     __tablename__ = "advisor"
-
-    email = db.Column(db.String(50), unique=True)
 
     __mapper_args__ = {
         'polymorphic_identity': 'advisor'
@@ -58,6 +75,7 @@ class Student(User):
         self.first_name = first_name
         self.last_name = last_name
         self.std_id = std_id
+        self.email = std_id + '@upm.edu.sa'
         self.password = password
         self.advisor_email = advisor_email
         self.is_confirmed = is_confirmed
