@@ -38,7 +38,7 @@ def stdSignup():
         hashedPass = generate_password_hash(password, method='sha256')
         advisor_email = str(form.advisor.data).lower()
         newUser = Student(first_name=form.first_name.data, last_name=form.last_name.data, password=hashedPass,
-                          std_id=form.std_id.data, advisor_email=advisor_email)
+                          email=form.std_id.data + '@upm.edu.sa', advisor_email=advisor_email)
 
         db.session.add(newUser)
         db.session.commit()
@@ -97,7 +97,7 @@ def student():
         return abort(403)
 
     name = current_user.first_name + ' ' + current_user.last_name
-    email = str(current_user.std_id) + '@upm.edu.sa'
+    email = str(current_user.email)
     application = current_user.application
 
     return render_template('student-dashboard.html', name=name, email=email, application=application)
@@ -138,7 +138,7 @@ def apply():
             return redirect('/student')
 
         student_name = current_user.first_name + ' ' + current_user.last_name
-        application = Application(current_user.std_id, student_name, level, credits, department, company, description,
+        application = Application(current_user.email, student_name, level, credits, department, company, description,
                                   current_user.advisor_email)
         db.session.add(application)
         db.session.commit()
@@ -170,13 +170,13 @@ def advisor():
                            applications=applications)
 
 
-@app.route('/viewApplication/<student_id>', methods=['GET', 'POST'])
+@app.route('/viewApplication/<student_email>', methods=['GET', 'POST'])
 @login_required
-def viewApplication(student_id):
+def viewApplication(student_email):
     if current_user.type_ != 'advisor':
         return abort(403)
 
-    application = Application.query.filter_by(student_id=student_id, advisor_email=current_user.email,
+    application = Application.query.filter_by(student_email=student_email, advisor_email=current_user.email,
                                               pending=True).first()
     if not application:
         return abort(404)

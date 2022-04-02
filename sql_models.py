@@ -62,8 +62,6 @@ class Advisor(User):
 class Student(User):
     __tablename__ = "student"
 
-    std_id = db.Column(db.Integer, unique=True)
-
     advisor_email = db.Column(db.String, db.ForeignKey(Advisor.email))
     application = db.relationship('Application', backref='student', uselist=False)
     advisor = db.relationship(Advisor, backref='student', remote_side=Advisor.email)
@@ -71,11 +69,10 @@ class Student(User):
         'polymorphic_identity': 'student'
     }
 
-    def __init__(self, first_name, last_name, std_id, password, advisor_email, is_confirmed=True):
+    def __init__(self, first_name, last_name, email, password, advisor_email, is_confirmed=True):
         self.first_name = first_name
         self.last_name = last_name
-        self.std_id = std_id
-        self.email = std_id + '@upm.edu.sa'
+        self.email = email
         self.password = password
         self.advisor_email = advisor_email
         self.is_confirmed = is_confirmed
@@ -87,7 +84,7 @@ class Student(User):
 class Application(db.Model):
     __tablename__ = "application"
 
-    student_id = db.Column(db.Integer, db.ForeignKey(Student.std_id), unique=True, primary_key=True)
+    student_email = db.Column(db.String, db.ForeignKey(Student.email), unique=True, primary_key=True)
     student_name = db.Column(db.String(50))
     level = db.Column(db.SmallInteger)
     credits = db.Column(db.Integer)
@@ -99,9 +96,9 @@ class Application(db.Model):
     pending = db.Column(db.Boolean, default=True)
     approved = db.Column(db.Boolean, default=False)
 
-    def __init__(self, student_id, student_name, level, credits, department, training_company, description,
+    def __init__(self, student_email, student_name, level, credits, department, training_company, description,
                  advisor_email, comment='', approved=False, pending=True):
-        self.student_id = student_id
+        self.student_email = student_email
         self.student_name = student_name
         self.level = level
         self.credits = credits

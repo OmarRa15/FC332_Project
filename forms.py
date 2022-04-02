@@ -10,6 +10,8 @@ from sql_models import Student, Advisor
 class LoginForm(FlaskForm):
     email = StringField('email', validators=[InputRequired(), Length(min=7, max=50),
                                              Email(message='Invalid email', check_deliverability=True)])
+    # email = StringField('email', validators=[InputRequired(), Length(min=7, max=50)])
+
     password = PasswordField('Password', validators=[InputRequired(), Length(min=8, max=80)])
     remember = BooleanField('Remember me')
 
@@ -19,7 +21,7 @@ class LoginForm(FlaskForm):
 
     def validate_email(self, email):
 
-        user = self.modelName.query.filter_by(email=email.data).first()
+        user = self.modelName.query.filter_by(email=email.data.lower()).first()
 
         if not user:
             raise ValidationError('incorrect username or password')
@@ -47,7 +49,7 @@ class StdRegisterForm(FlaskForm):
         if not str(studentID.data).isnumeric():
             raise ValidationError("Incorrect ID format")
 
-        user = Student.query.filter_by(std_id=studentID.data).first()
+        user = Student.query.filter_by(email=studentID.data + '@upm.edu.sa').first()
 
         if user:
             raise ValidationError('User already exists')
@@ -58,6 +60,7 @@ class AdvRegisterForm(FlaskForm):
     last_name = StringField('Last Name', validators=[InputRequired(), Length(min=3, max=20)])
     email = StringField('Email', validators=[InputRequired(), Email(message='Invalid email', check_deliverability=True),
                                              Length(max=50)])
+
     password = PasswordField('Password', validators=[InputRequired(), Length(min=8, max=80),
                                                      EqualTo('confirm', message='Passwords must match')])
     confirm = PasswordField('Confirm_password', validators=[InputRequired(), Length(min=8, max=80)])

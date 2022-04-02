@@ -209,7 +209,7 @@
                                 </td>
                                 <td>
                                     <div>
-                                        Student ID
+                                        Student Email
                                     </div>
                                 </td>
                             </tr>
@@ -229,13 +229,13 @@
                                     </td>
                                     <td>
                                         <div>
-                                            {{ app.student_id }}
+                                            {{ app.student_email }}
                                         </div>
                                     </td>
                                     <td>
                                         <div>
                                             <a class="accept"
-                                               href="{{ url_for('viewApplication',student_id=app.student_id) }}"
+                                               href="{{ url_for('viewApplication',student_email=app.student_email) }}"
                                                style="background:green ;color: white;border: 1px solid #fff;padding:.5rem;border-radius: 3px;">View
                                                 and Take Action</a>
                                         </div>
