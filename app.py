@@ -192,12 +192,6 @@ def viewApplication(student_email):
         application.comment = comment
         db.session.commit()
 
-        if approved:
-            # TODO:  Send Approval Email with the comment.
-            pass
-        else:
-            # TODO: Send Disapproval Email with the comment.
-            pass
         return redirect('/advisor')
 
     form.student_name.data = application.student_name
@@ -214,7 +208,6 @@ def viewApplication(student_email):
 def adminLogin():
     if current_user.is_authenticated:
         return redirect('/' + current_user.type_)
-
     form = LoginForm(Administrator)
     if form.validate_on_submit():
         user = Administrator.query.filter_by(email=form.email.data.lower()).first()
@@ -223,6 +216,19 @@ def adminLogin():
         return redirect(url_for('administrator'))
 
     return render_template('formPage.html', form=form, Name='Log in')
+
+
+@app.route('/searchAdvisor/<advisor_name>')
+@login_required
+def searchAdvisor(advisor_name):
+    if current_user.type_ != 'student':
+        return abort(403)
+
+    # A vulnerable Query:
+    result = db.session.execute(
+        f"SELECT first_name, last_name, email FROM users WHERE type_='advisor' AND first_name='{advisor_name}';").all()
+
+    return render_template('search-Result.html', result=result)
 
 
 @app.route('/administrator')
