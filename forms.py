@@ -1,17 +1,16 @@
 from flask_wtf import FlaskForm
 from wtforms import StringField, PasswordField, BooleanField, IntegerField, SelectField, TextAreaField
-from wtforms.validators import InputRequired, Length, EqualTo, ValidationError, Email
+from wtforms.validators import InputRequired, Length, EqualTo, Email
 from werkzeug.security import check_password_hash
 from wtforms_sqlalchemy.fields import QuerySelectField
 
+from validations import *
 from sql_models import Student, Advisor
 
 
 class LoginForm(FlaskForm):
     email = StringField('email', validators=[InputRequired(), Length(min=7, max=50),
                                              Email(message='Invalid email', check_deliverability=True)])
-    # email = StringField('email', validators=[InputRequired(), Length(min=7, max=50)])
-
     password = PasswordField('Password', validators=[InputRequired(), Length(min=8, max=80)])
     remember = BooleanField('Remember me')
 
@@ -45,14 +44,20 @@ class StdRegisterForm(FlaskForm):
     advisor = QuerySelectField(query_factory=advisorQuery, allow_blank=False, get_label='email')
 
     def validate_std_id(self, studentID):
-
-        if not str(studentID.data).isnumeric():
-            raise ValidationError("Incorrect ID format")
+        studentID_validation(studentID.data)
 
         user = Student.query.filter_by(email=studentID.data + '@upm.edu.sa').first()
-
         if user:
             raise ValidationError('User already exists')
+
+    def validate_first_name(self, first_name):
+        name_validation(first_name.data)
+
+    def validate_last_name(self, lastname):
+        name_validation(lastname.data)
+
+    def validate_password(self, password):
+        password_validation(password.data)
 
 
 class AdvRegisterForm(FlaskForm):
@@ -66,13 +71,20 @@ class AdvRegisterForm(FlaskForm):
     confirm = PasswordField('Confirm_password', validators=[InputRequired(), Length(min=8, max=80)])
 
     def validate_email(self, email):
-
-        if not str(email.data.lower()).endswith('@upm.edu.sa'):
-            raise ValidationError("Not a UPM email.")
+        advisorEmail_validations(email.data)
 
         user = Advisor.query.filter_by(email=email.data.lower()).first()
         if user:
             raise ValidationError('email already exists')
+
+    def validate_first_name(self, first_name):
+        name_validation(first_name.data)
+
+    def validate_last_name(self, lastname):
+        name_validation(lastname.data)
+
+    def validate_password(self, password):
+        password_validation(password.data)
 
 
 class ApplicationForm(FlaskForm):
@@ -84,20 +96,10 @@ class ApplicationForm(FlaskForm):
     description = TextAreaField('description:', validators=[InputRequired(), Length(max=500)])
 
     def validate_level(self, level):
-
-        if not str(level.data).isnumeric():
-            raise ValidationError("level must be an integer between 1 and 8.")
-
-        if not (0 < int(str(level.data)) < 9):
-            raise ValidationError("level must be between 1 and 8.")
+        level_validation(level.data)
 
     def validate_credits(self, credits):
-
-        if not str(credits.data).isnumeric():
-            raise ValidationError("credits must be an integer between 0 and 100.")
-
-        if not (0 < int(str(credits.data)) < 100):
-            raise ValidationError("credits must be between 0 and 100.")
+        credits_validations(credits.data)
 
 
 class ViewApplicationForm(FlaskForm):
