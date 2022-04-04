@@ -5,7 +5,7 @@ from werkzeug.security import check_password_hash
 from wtforms_sqlalchemy.fields import QuerySelectField
 
 from validations import *
-from sql_models import Student, Advisor
+from sql_models import Student, Advisor, User
 
 
 class LoginForm(FlaskForm):
@@ -112,3 +112,24 @@ class ViewApplicationForm(FlaskForm):
 
     comment = TextAreaField('Your Comment:', validators=[InputRequired(), Length(max=500)])
     approved = BooleanField('Approve')
+
+
+class EmailForm(FlaskForm):
+    email = StringField('Enter Your email',
+                        validators=[InputRequired(), Email(message='Invalid email', check_deliverability=True),
+                                    Length(max=50)])
+
+    def validate_email(self, email):
+        user = User.query.filter_by(email=email.data.lower()).first()
+
+        if not user:
+            raise ValidationError("email doesn't exists")
+
+
+class ResetForm(FlaskForm):
+    password = PasswordField('New Password', validators=[InputRequired(), Length(min=8, max=80),
+                                                         EqualTo('confirm', message='Passwords must match')])
+    confirm = PasswordField('Confirm password', validators=[InputRequired(), Length(min=8, max=80)])
+
+    def validate_password(self, password):
+        password_validation(password.data)

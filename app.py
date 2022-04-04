@@ -4,6 +4,9 @@ from flask import render_template, redirect, url_for, flash
 from flask_login import login_user, login_required, current_user, logout_user, LoginManager
 from werkzeug.security import generate_password_hash
 from flask_bootstrap import Bootstrap
+from itsdangerous import URLSafeTimedSerializer, SignatureExpired, BadTimeSignature, BadSignature
+
+from send_mail import send_reset_mail, send_confirmation_mail
 
 app = Flask(__name__)
 
@@ -12,7 +15,8 @@ app.config['SQLALCHEMY_DATABASE_URI'] = environ['DATABASE_URL'][0:8] + 'ql' + en
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 
 from sql_models import db, User, Student, Advisor, Application, Administrator
-from forms import StdRegisterForm, AdvRegisterForm, ApplicationForm, ViewApplicationForm, LoginForm
+from forms import StdRegisterForm, AdvRegisterForm, ApplicationForm, ViewApplicationForm, LoginForm, EmailForm, \
+    ResetForm
 
 loginManager = LoginManager()
 loginManager.init_app(app)
@@ -59,10 +63,10 @@ def stdLogin():
     if form.validate_on_submit():
         user = Student.query.filter_by(email=form.email.data.lower()).first()
 
-        # if not user.is_confirmed:
-        #     return '<h1 style= "text-align: center">Your Email hasn\'t been confirmed yet,' \
-        #            '\nPlease <a href="{}">click here</a> to confirm your email <h1>' \
-        #         .format(url_for('send_confirmation', email=user.email, _external=True))
+        if not user.is_confirmed:
+            return '<h1 style= "text-align: center">Your Email hasn\'t been confirmed yet,' \
+                   '\nPlease <a href="{}">click here</a> to confirm your email <h1>' \
+                .format(url_for('send_confirmation', email=user.email, _external=True))
 
         login_user(user, remember=form.remember.data)
         return redirect('/student')
@@ -80,14 +84,95 @@ def advLogin():
     if form.validate_on_submit():
         user = Advisor.query.filter_by(email=form.email.data.lower()).first()
 
-        # if not user.is_confirmed:
-        #     return '<h1 style= "text-align: center">Your Email hasn\'t been confirmed yet,' \
-        #            '\nPlease <a href="{}">click here</a> to confirm your email <h1>' \
-        #         .format(url_for('send_confirmation', email=user.email, _external=True))
         login_user(user, remember=form.remember.data)
         return redirect(url_for('advisor'))
 
     return render_template('formPage.html', form=form, Name='Log in')
+
+
+serializer = URLSafeTimedSerializer(app.config['SECRET_KEY'])
+
+
+@app.route('/forgot', methods=['GET', 'POST'])
+def forgot():
+    if current_user.is_authenticated:
+        return abort(403)
+
+    form = EmailForm()
+    if form.validate_on_submit():
+        email = form.email.data.lower()
+        user = User.query.filter_by(email=email).first()
+        if user:
+            token = serializer.dumps(email)
+            link = url_for('resetPass', token=token, _external=True)
+            if send_reset_mail(recipient=email, link=link):
+                message = "Reset email has been sent successfully,\n Please check your email"
+                return render_template('messagePage.html', message=message)
+            message = "The email could not be sent. Please try again later"
+            return render_template('messagePage.html', message=message)
+
+    return render_template('formPage.html', form=form)
+
+
+@app.route('/resetPass/<token>', methods=['GET', 'POST'])
+def resetPass(token):
+    if current_user.is_authenticated:
+        return abort(403)
+    try:
+        form = ResetForm()
+        email = serializer.loads(token, max_age=1800)
+        user = User.query.filter_by(email=email).first()
+        if form.validate_on_submit():
+            hashedPass = generate_password_hash(form.password.data, method='sha256')
+            user.password = hashedPass
+            db.session.commit()
+            flash("Password has been reset Successfully!!")
+            return redirect('/')
+        return render_template('formPage.html', form=form)
+    except SignatureExpired:
+        return render_template('messagePage.html', message="Signature Expired")
+    except BadTimeSignature:
+        return abort(404)
+    except BadSignature:
+        return abort(404)
+
+
+@app.route('/send_confirmation/<email>')
+def send_confirmation(email):
+    if current_user.is_authenticated:
+        return abort(403)
+
+    user = User.query.filter_by(email=email).first()
+    if not user:
+        return abort(404)
+    if user.is_confirmed:
+        return abort(403)
+
+    token = serializer.dumps(email)
+    link = url_for('confirm_email', token=token, _external=True)
+    if send_confirmation_mail(recipient=email, link=link):
+        message = "Email confirmation has been sent successfully, Please check your email\n"
+        return render_template('messagePage.html', message=message)
+
+    message = "The email could not be sent. Please try again later"
+    return render_template('messagePage.html', message=message)
+
+
+@app.route('/confirm_email/<token>')
+def confirm_email(token):
+    try:
+        email = serializer.loads(token, max_age=1800)
+        user = User.query.filter_by(email=email).first()
+        user.is_confirmed = True
+        db.session.commit()
+        message = "Your email has been confirmed successfully. You can sign in now."
+        return render_template('messagePage.html', message=message)
+    except SignatureExpired:
+        return render_template('messagePage.html', message='Signature Expired')
+    except BadTimeSignature:
+        return abort(404)
+    except BadSignature:
+        return abort(404)
 
 
 @app.route('/student')
@@ -293,8 +378,8 @@ def landing():
 @login_required
 def logout():
     logout_user()
-    return redirect(url_for('stdLogin'))
+    return redirect(url_for('landing'))
 
 
 if __name__ == '__main__':
-    app.run(debug=True)
+    app.run()

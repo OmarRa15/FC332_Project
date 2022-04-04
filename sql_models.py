@@ -13,7 +13,7 @@ class User(db.Model, UserMixin):
     first_name = db.Column(db.String(20))
     last_name = db.Column(db.String(20))
     password = db.Column(db.String(255))
-    is_confirmed = db.Column(db.Boolean, default=True)
+    is_confirmed = db.Column(db.Boolean, default=False)
 
     type_ = db.Column(db.String(20))
 
@@ -48,12 +48,12 @@ class Advisor(User):
         'polymorphic_identity': 'advisor'
     }
 
-    def __init__(self, first_name, last_name, email, password, is_confirmed=True):
+    def __init__(self, first_name, last_name, email, password):
         self.first_name = first_name
         self.last_name = last_name
         self.email = email
         self.password = password
-        self.is_confirmed = is_confirmed
+        self.is_confirmed = True
 
     def __repr__(self):
         return str(self.email)
@@ -69,16 +69,17 @@ class Student(User):
         'polymorphic_identity': 'student'
     }
 
-    def __init__(self, first_name, last_name, email, password, advisor_email, is_confirmed=True):
+    def __init__(self, first_name, last_name, email, password, advisor_email):
         self.first_name = first_name
         self.last_name = last_name
         self.email = email
         self.password = password
         self.advisor_email = advisor_email
-        self.is_confirmed = is_confirmed
+        self.is_confirmed = False
 
     def __repr__(self):
-        return 'StdID: ' + str(self.std_id) + ' ' + self.first_name + ' ' + self.last_name + str(self.advisor_email)
+        return 'StdID: ' + str(self.email[:-11]) + ' ' + self.first_name + ' ' + self.last_name + ' ' + str(
+            self.advisor_email)
 
 
 class Application(db.Model):
@@ -111,4 +112,4 @@ class Application(db.Model):
         self.approved = approved
 
     def __repr__(self):
-        return 'StdID: ' + str(self.student_id) + ' Advisor:' + str(self.advisor_email)
+        return 'StdID: ' + str(self.student_email[:-11]) + ' Advisor:' + str(self.advisor_email)
