@@ -1,4 +1,4 @@
-from flask import Flask, abort
+from flask import Flask, abort, request
 from os import environ
 from flask import render_template, redirect, url_for, flash
 from flask_login import login_user, login_required, current_user, logout_user, LoginManager
@@ -218,11 +218,14 @@ def adminLogin():
     return render_template('formPage.html', form=form, Name='Log in')
 
 
-@app.route('/searchAdvisor/<advisor_name>')
+@app.route('/searchAdvisor')
 @login_required
-def searchAdvisor(advisor_name):
+def searchAdvisor():
     if current_user.type_ != 'student':
         return abort(403)
+
+    args = request.args
+    advisor_name = args.get('name', default='')
 
     # A vulnerable Query:
     result = db.session.execute(
