@@ -358,20 +358,12 @@ def addAdvisor():
     return render_template('formPage.html', form=form, Name='Add Advisor')
 
 
-temp_landing_page = f'''<body>
-<a href="/stdSignup" style= "text-align: center" > Student Signup </a> <br/>
-<a href="/stdLogin"  style= "text-align: center" > Student Login </a> <br/>
-<a href="/advLogin"  style= "text-align: center" > Advisor Login </a> <br/>
-<body/>
-'''
-
-
 @app.route('/')
 def landing():
     if current_user.is_authenticated:
         return redirect('/' + current_user.type_)
 
-    return temp_landing_page
+    return render_template('landing.html')
 
 
 @app.route('/logout')
