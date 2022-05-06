@@ -1,9 +1,14 @@
 from flask_login import UserMixin
 from flask_sqlalchemy import SQLAlchemy
 
-from app import app
+db = SQLAlchemy()
 
-db = SQLAlchemy(app)
+
+def db_init(app):
+    db.init_app(app)
+
+    with app.app_context():
+        db.create_all()
 
 
 class User(db.Model, UserMixin):

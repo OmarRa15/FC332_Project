@@ -8,18 +8,17 @@ from flask_bootstrap import Bootstrap
 from itsdangerous import URLSafeTimedSerializer, SignatureExpired, BadTimeSignature, BadSignature
 import re
 from send_mail import send_reset_mail, send_confirmation_mail
+from sql_models import db, db_init, User, Student, Advisor, Application, Administrator, Image
+from forms import StdRegisterForm, AdvRegisterForm, ApplicationForm, ViewApplicationForm, LoginForm, EmailForm, \
+    ResetForm
 
 app = Flask(__name__)
 
 app.config['SECRET_KEY'] = environ['SECRET_KEY']
 app.config['SQLALCHEMY_DATABASE_URI'] = environ['DATABASE_URL'][0:8] + 'ql' + environ['DATABASE_URL'][8:]
 # app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///img.db'
-
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
-
-from sql_models import db, User, Student, Advisor, Application, Administrator, Image
-from forms import StdRegisterForm, AdvRegisterForm, ApplicationForm, ViewApplicationForm, LoginForm, EmailForm, \
-    ResetForm
+db_init(app)
 
 loginManager = LoginManager()
 loginManager.init_app(app)
