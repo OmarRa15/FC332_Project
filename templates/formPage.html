@@ -44,7 +44,9 @@
             {#            {{ form.hidden_tag() }}#}
             {#            {{ form.csrf_token }}#}
             {% for field in form %}
-                {{ wtf.form_field(field) }}
+                {% if field != form.csrf_token %}
+                    {{ wtf.form_field(field) }}
+                {% endif %}
             {% endfor %}
 
             {#    <a href="{{ url_for(links['Login']) }}">already have an account?<br/>login here!!</a><br/>#}
