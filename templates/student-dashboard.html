@@ -20,21 +20,27 @@ Student Dashboard
                     <img src="{{url_for('.static', filename='img/logo-en.png')}}" alt="" width="160px" height="49px">
                     <div class="brand-icons">
                         <div class="menu-toggle">
-                                <label for="sidebar-toggle">
-                                        <span class = "las la-bars"></span>
-                                </label>
+                            <label for="sidebar-toggle">
+                                <span class="las la-bars"></span>
+                            </label>
                         </div>
                     </div>
                 </div>
             </div>
             <div class="side-bar-main">
-               <div class="sidebar-user">
-                <img src="{{url_for('.static', filename='img/user.png')}}" alt="" title="">
-                <div>
-                    <h3>{{ name }}</h3>
-                    <span>{{ email }}</span>
+                <div class="sidebar-user">
+                    {% if not image %}
+                        <img src="{{ url_for('.static', filename='img/user.png') }}">
+                    {% endif %}
+
+                    {% if image %}
+                        <img src="{{ url_for('profile_pic',email=email) }}">
+                    {% endif %}
+                    <div>
+                        <h3>{{ name }}</h3>
+                        <span>{{ email }}</span>
+                    </div>
                 </div>
-               </div>
                 <div class="sidebar-menu">
                     <ul>
                         <li>

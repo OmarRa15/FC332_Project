@@ -1,20 +1,23 @@
-from flask import Flask, abort, request
+from flask import Flask, abort, request, Response
 from os import environ
 from flask import render_template, redirect, url_for, flash
 from flask_login import login_user, login_required, current_user, logout_user, LoginManager
 from werkzeug.security import generate_password_hash
+from werkzeug.utils import secure_filename
 from flask_bootstrap import Bootstrap
 from itsdangerous import URLSafeTimedSerializer, SignatureExpired, BadTimeSignature, BadSignature
-
+import re
 from send_mail import send_reset_mail, send_confirmation_mail
 
 app = Flask(__name__)
 
 app.config['SECRET_KEY'] = environ['SECRET_KEY']
 app.config['SQLALCHEMY_DATABASE_URI'] = environ['DATABASE_URL'][0:8] + 'ql' + environ['DATABASE_URL'][8:]
+# app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///img.db'
+
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 
-from sql_models import db, User, Student, Advisor, Application, Administrator
+from sql_models import db, User, Student, Advisor, Application, Administrator, Image
 from forms import StdRegisterForm, AdvRegisterForm, ApplicationForm, ViewApplicationForm, LoginForm, EmailForm, \
     ResetForm
 
@@ -41,10 +44,25 @@ def stdSignup():
         password = form.password.data
         hashedPass = generate_password_hash(password, method='sha256')
         advisor_email = str(form.advisor.data).lower()
+
         newUser = Student(first_name=form.first_name.data, last_name=form.last_name.data, password=hashedPass,
                           email=form.std_id.data + '@upm.edu.sa', advisor_email=advisor_email)
-
         db.session.add(newUser)
+
+        image = request.files[form.image.name]
+
+        if image:
+
+            regex = re.match('^[^\'" *;/]+\.((jpg)|(jpeg)|(png))$', image.filename)
+            if regex:
+                image_name = secure_filename(str(image.filename))
+
+                mime_type = image.mimetype
+
+                image = Image(newUser.email, image.read(), image_name, mime_type)
+
+                db.session.add(image)
+
         db.session.commit()
 
         flash("Signed Up Successfully!!")
@@ -185,7 +203,8 @@ def student():
     email = str(current_user.email)
     application = current_user.application
 
-    return render_template('student-dashboard.html', name=name, email=email, application=application)
+    return render_template('student-dashboard.html', image=current_user.image, name=name, email=email,
+                           application=application)
 
 
 @app.route('/apply', methods=['GET', 'POST'])
@@ -371,6 +390,20 @@ def landing():
 def logout():
     logout_user()
     return redirect(url_for('landing'))
+
+
+@app.route('/image/<email>')
+@login_required
+def profile_pic(email):
+    if current_user.email != email:
+        return abort(404)
+
+    image = current_user.image
+
+    if not image:
+        return abort(404)
+
+    return Response(image.img_data, mimetype=image.mime_type)
 
 
 if __name__ == '__main__':

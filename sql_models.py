@@ -15,6 +15,8 @@ class User(db.Model, UserMixin):
     password = db.Column(db.String(255))
     is_confirmed = db.Column(db.Boolean, default=False)
 
+    image = db.relationship('Image', backref='users', uselist=False)
+
     type_ = db.Column(db.String(20))
 
     __mapper_args__ = {
@@ -80,6 +82,21 @@ class Student(User):
     def __repr__(self):
         return 'StdID: ' + str(self.email[:-11]) + ' ' + self.first_name + ' ' + self.last_name + ' ' + str(
             self.advisor_email)
+
+
+class Image(db.Model):
+    __tablename__ = "image"
+
+    user_email = db.Column(db.String, db.ForeignKey(User.email), unique=True, primary_key=True)
+    img_data = db.Column(db.LargeBinary, nullable=False)
+    name = db.Column(db.String(255), nullable=False)
+    mime_type = db.Column(db.String(255), nullable=False)
+
+    def __init__(self, email, img_data, name, mime_type):
+        self.user_email = email
+        self.img_data = img_data
+        self.name = name
+        self.mime_type = mime_type
 
 
 class Application(db.Model):

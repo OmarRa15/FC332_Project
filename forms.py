@@ -1,5 +1,6 @@
 from flask_wtf import FlaskForm
-from wtforms import StringField, PasswordField, BooleanField, IntegerField, SelectField, TextAreaField
+from wtforms import StringField, PasswordField, BooleanField, IntegerField, SelectField, TextAreaField, FileField, \
+    validators
 from wtforms.validators import InputRequired, Length, EqualTo, Email
 from werkzeug.security import check_password_hash
 from wtforms_sqlalchemy.fields import QuerySelectField
@@ -42,6 +43,8 @@ class StdRegisterForm(FlaskForm):
     confirm = PasswordField('Confirm_password', validators=[InputRequired(), Length(min=8, max=80)])
 
     advisor = QuerySelectField(query_factory=advisorQuery, allow_blank=False, get_label='email')
+
+    image = FileField('Image File')
 
     def validate_std_id(self, studentID):
         studentID_validation(studentID.data)
