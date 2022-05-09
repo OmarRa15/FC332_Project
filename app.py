@@ -39,8 +39,8 @@ def stdSignup():
 
     form = StdRegisterForm()
 
-    # if form.validate_on_submit():
-    if request.method == 'POST':
+    if form.validate_on_submit():
+        # if request.method == 'POST':
         password = form.password.data
         hashedPass = generate_password_hash(password, method='sha256')
         advisor_email = str(form.advisor.data).lower()

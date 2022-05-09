@@ -41,8 +41,8 @@
         <form class="form-signin" method="post" action="" enctype="multipart/form-data">
             <h2 class="form-signin-heading">{{ Name }}</h2>
             <h3 style='color: red'>{{ errorMsg }}</h3>
-            {#            {{ form.hidden_tag() }}#}
-            {#            {{ form.csrf_token }}#}
+            {{ form.hidden_tag() }}
+            {{ form.csrf_token }}
             {% for field in form %}
                 {% if field != form.csrf_token %}
                     {{ wtf.form_field(field) }}
