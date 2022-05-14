@@ -42,18 +42,6 @@ Admin Dashboard
                         <span>Dashboard</span>
                     </div>
                     <ul>
-{#                       <li>#}
-{#                           <a href="/admin_views/users">#}
-                        {#                               <span class="las "></span>#}
-                        {#                               👨🏻‍🎓 Student Management#}
-                        {#                           </a>#}
-                        {#                       </li>#}
-                        {#                       <li>#}
-                        {#                           <a href="/admin_views/room">#}
-                        {#                               <span class="las la-management"></span>#}
-                        {#                               🏠 Room Management#}
-                        {#                           </a>#}
-                        {#                       </li>#}
                         <li>
                             <a href="{{ url_for('addAdvisor') }}">
                                 <span class="las la-chart-pie2"></span>
@@ -132,60 +120,6 @@ Admin Dashboard
                 </div>
             </div>
 
-            {#                <div class="jobs-grid">#}
-            {#                    <div class="jobs" style="margin-top:30px;margin-right:20px; width:49%;float:left">#}
-            {#                        <h2>Applications 📬</h2>#}
-            {#                        <div class="table-responsive">#}
-            {#                            <table width = "100%">#}
-            {#                                <tbody>#}
-            {#                                    <tr>#}
-            {#                                        <td>#}
-            {#                                            <div>#}
-            {#                                               <span class="indicator"></span>#}
-            {#                                            </div>#}
-            {#                                        </td>#}
-            {#                                        <td>#}
-            {#                                            <div>#}
-            {#                                               Student Name#}
-            {#                                            </div>#}
-            {#                                        </td>#}
-            {#                                        <td>#}
-            {#                                            <div>#}
-            {#                                               Student ID#}
-            {#                                            </div>#}
-            {#                                        </td>#}
-            {#                                    </tr>#}
-            {#                                   </tbody>#}
-            {#                                   <tbody>#}
-            {#                                   {% for app in applications %}#}
-            {#                               <tr>#}
-            {#                                   <td>#}
-            {#                                       <div>#}
-            {#                                          <span class="indicator even"></span>#}
-            {#                                       </div>#}
-            {#                                   </td>#}
-            {#                                   <td>#}
-            {#                                       <div>#}
-            {#                                           {{ app.student_name }}#}
-            {#                                       </div>#}
-            {#                                   </td>#}
-            {#                                   <td>#}
-            {#                                       <div>#}
-            {#                                           {{ app.student_id }}#}
-            {#                                       </div>#}
-            {#                                   </td>#}
-            {#                                   <td>#}
-            {#                                       <div>#}
-            {#                                          <a class="accept" href="{{ url_for('viewApplication',student_id=app.student_id) }}" style="background:green ;color: white;border: 1px solid #fff;padding:.5rem;border-radius: 3px;" >View and Take Action</a>#}
-            {#                                       </div>#}
-            {#                                   </td>#}
-            {#                               </tr>#}
-            {#                               {% endfor %}#}
-            {#                           </tbody>#}
-            {#                               </table>#}
-            {#                        </div>#}
-            {#                    </div>#}
-            {#                </div>#}
         </main>
     </div>
     <label for="sidebar-toggle" class="body-lable"></label>
