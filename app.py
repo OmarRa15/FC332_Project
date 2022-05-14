@@ -206,6 +206,22 @@ def student():
                            application=application)
 
 
+@app.route('/searchStudent')
+@login_required
+def searchStudent():
+    if current_user.type_ != 'advisor':
+        return abort(403)
+
+    args = request.args
+    student_name = args.get('name', default='')
+
+    # A vulnerable Query:
+    result = db.session.execute(
+        f"SELECT * FROM student_view WHERE first_name= :name;", {'name': student_name}).all()
+
+    return render_template('search-Result.html', result=result)
+
+
 @app.route('/apply', methods=['GET', 'POST'])
 @login_required
 def apply():
