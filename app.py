@@ -39,8 +39,7 @@ def stdSignup():
 
     form = StdRegisterForm()
 
-    # if form.validate_on_submit():
-    if request.method == 'POST':
+    if form.validate_on_submit():
         password = form.password.data
         hashedPass = generate_password_hash(password, method='sha256')
         advisor_email = str(form.advisor.data).lower()
@@ -105,7 +104,7 @@ def advLogin():
         login_user(user, remember=form.remember.data)
         return redirect(url_for('advisor'))
 
-    return render_template('formPage.html', form=form, Name='Log in')
+    return render_template('formPage.html', form=form, Name='Login')
 
 
 serializer = URLSafeTimedSerializer(app.config['SECRET_KEY'])
@@ -129,7 +128,7 @@ def forgot():
             message = "The email could not be sent. Please try again later"
             return render_template('messagePage.html', message=message)
 
-    return render_template('formPage.html', form=form)
+    return render_template('formPage.html', form=form, Name='Enter your email')
 
 
 @app.route('/resetPass/<token>', methods=['GET', 'POST'])
@@ -146,7 +145,7 @@ def resetPass(token):
             db.session.commit()
             flash("Password has been reset Successfully!!")
             return redirect('/')
-        return render_template('formPage.html', form=form)
+        return render_template('formPage.html', form=form, Name='Reset')
     except SignatureExpired:
         return render_template('messagePage.html', message="Signature Expired")
     except BadTimeSignature:

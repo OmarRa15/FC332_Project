@@ -27,8 +27,6 @@
                             <span class="las la-bars"></span>
                         </label>
                     </div>
-                    {#                        <span class="las la-bell"></span>#}
-                    {#                        <span class="las la-user-circle"></span>#}
                 </div>
             </div>
         </div>
@@ -41,29 +39,6 @@
                 </div>
             </div>
             <div class="sidebar-menu">
-                {#                   <div class="menu-head">#}
-                {#                       <span>Dashboard</span>#}
-                {#                   </div>#}
-                {#                   <ul>#}
-                {#                       <li>#}
-                {#                           <a href="/admin_views/users">#}
-                {#                               <span class="las "></span>#}
-                {#                               👨🏻‍🎓 Student Management#}
-                {#                           </a>#}
-                {#                       </li>#}
-                {#                       <li>#}
-                {#                           <a href="/admin_views/room">#}
-                {#                               <span class="las la-management"></span>#}
-                {#                               🏠 Room Management#}
-                {#                           </a>#}
-                {#                       </li>#}
-                {#                       <li>#}
-                {#                           <a href="{{ url_for('add_student') }}">#}
-                {#                               <span class="las la-chart-pie2"></span>#}
-                {#                               &nbsp&nbsp add a New Student Account#}
-                {#                           </a>#}
-                {#                       </li>#}
-                {#                   </ul>#}
                 <div class="menu-head">
                     <span>Applications</span>
                 </div>
@@ -80,12 +55,6 @@
                             🖥 UPM website
                         </a>
                     </li>
-                    {#                 <li>#}
-                    {#                     <a href="">#}
-                    {#                         <span class="las la-calender"></span>#}
-                    {#                         📆 Calendar#}
-                    {#                     </a>#}
-                    {#                 </li>#}
                 </ul>
             </div>
         </div>
@@ -107,16 +76,6 @@
                     <h1>FC332 Advisor Dashboard</h1>
                     <small> Analytics Admin Monitor </small>
                 </div>
-                {#                    <div class="header-actions">#}
-                {#                        <button>#}
-                {#                            <span class="las la-file-export"></span>#}
-                {#                            Export#}
-                {#                        </button>#}
-                {#                        <button>#}
-                {#                            <span class="las la-tools"></span>#}
-                {#                            Settings#}
-                {#                        </button>#}
-                {#                    </div>#}
             </div>
 
             <div class="cards">
@@ -128,68 +87,14 @@
                                 <small>Number of pending applications</small>
                             </div>
                             <h2>{{ apps_num }}</h2>
-
-                            {#                                <small>{{ students_persentage }}% hostel capacity</small>#}
                         </div>
                         <div class="card-chart success">
                             <span class="las la-users"></span>
                         </div>
                     </div>
                 </div>
-                {#                    <div class="cards-single">#}
-                {#                        <div class="card-flex">#}
-                {#                            <div class="card-info">#}
-                {#                                <div class="card-head">#}
-                {#                                    <span>Rooms</span>#}
-                {#                                    <small>Number of Rooms available</small>#}
-                {#                                </div>#}
-                {#                                <h2>{{ rooms_no }}</h2>#}
-                {##}
-                {#                                <small>{{ rooms_persentage }}% hostel capacity available</small>#}
-                {#                            </div>#}
-                {#                            <div class="card-chart blue">#}
-                {#                                <span class="las la-home"></span>#}
-                {#                            </div>#}
-                {#                        </div>#}
-                {#                    </div>#}
-                {#                    <div class="cards-single">#}
-                {#                        <div class="card-flex">#}
-                {#                            <div class="card-info">#}
-                {#                                <div class="card-head">#}
-                {#                                    <span>Reservation</span>#}
-                {#                                    <small>Number of Reservation Requests</small>#}
-                {#                                </div>#}
-                {#                                <h2>{{ request_no }}</h2>#}
-                {##}
-                {#                            </div>#}
-                {#                            <div class="card-chart danger">#}
-                {#                                <span class="las la-registered"></span>#}
-                {#                            </div>#}
-                {#                        </div>#}
-                {#                    </div>#}
             </div>
 
-            {#                    <div class="analytics-card">#}
-            {##}
-            {#                        <div class="analytics-head">#}
-            {#                            <h3>Action Needed</h3>#}
-            {#                            <span class="las la-ellipsis-h"></span>#}
-            {#                        </div>#}
-            {##}
-            {#                        <div class="analytics-chart">#}
-            {#                            <div class="chart-circle">#}
-            {#                                <h1>74%</h1>#}
-            {#                            </div>#}
-            {##}
-            {#                            <div class="analytics-note">#}
-            {#                                <small>Note:>>>>.... </small>#}
-            {#                            </div>#}
-            {#                        </div>#}
-            {##}
-            {#                        <div class="analytics-btn">#}
-            {#                            <button>Generate report</button>#}
-            {#                        </div>#}
-            {#                    </div>#}
             <div class="jobs-grid">
                 <div class="jobs" style="margin-top:30px;margin-right:20px; width:49%;float:left">
                     <h2>Applications 📬</h2>
