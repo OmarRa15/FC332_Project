@@ -13,7 +13,7 @@ class LoginForm(FlaskForm):
     email = StringField('email', validators=[InputRequired(), Length(min=7, max=50),
                                              Email(message='Invalid email', check_deliverability=True)])
     password = PasswordField('Password', validators=[InputRequired(), Length(min=8, max=80)])
-    remember = BooleanField('Remember me')
+    remember = BooleanField('Remember Me')
 
     def __init__(self, modelName):
         super().__init__()
@@ -40,11 +40,11 @@ class StdRegisterForm(FlaskForm):
 
     password = PasswordField('Password', validators=[InputRequired(), Length(min=8, max=80),
                                                      EqualTo('confirm', message='Passwords must match')])
-    confirm = PasswordField('Confirm_password', validators=[InputRequired(), Length(min=8, max=80)])
+    confirm = PasswordField('Confirm Password', validators=[InputRequired(), Length(min=8, max=80)])
 
     advisor = QuerySelectField(query_factory=advisorQuery, allow_blank=False, get_label='email')
 
-    image = FileField('Image File')
+    image = FileField('Profile Picture')
 
     def validate_std_id(self, studentID):
         studentID_validation(studentID.data)
@@ -71,7 +71,7 @@ class AdvRegisterForm(FlaskForm):
 
     password = PasswordField('Password', validators=[InputRequired(), Length(min=8, max=80),
                                                      EqualTo('confirm', message='Passwords must match')])
-    confirm = PasswordField('Confirm_password', validators=[InputRequired(), Length(min=8, max=80)])
+    confirm = PasswordField('Confirm Password', validators=[InputRequired(), Length(min=8, max=80)])
 
     def validate_email(self, email):
         advisorEmail_validations(email.data)
@@ -95,8 +95,8 @@ class ApplicationForm(FlaskForm):
     level = IntegerField('Level', validators=[InputRequired()])
     credits = IntegerField('Credits', validators=[InputRequired()])
     department = SelectField('Department', choices=departments, validators=[InputRequired()])
-    training_company = StringField('training_company', validators=[InputRequired(), Length(min=5, max=50)])
-    description = TextAreaField('description:', validators=[InputRequired(), Length(max=500)])
+    training_company = StringField('Training Company', validators=[InputRequired(), Length(min=5, max=50)])
+    description = TextAreaField('Description:', validators=[InputRequired(), Length(max=500)])
 
     def validate_level(self, level):
         level_validation(level.data)
@@ -110,8 +110,8 @@ class ViewApplicationForm(FlaskForm):
     level = StringField('Level', render_kw={'readonly': True})
     credits = StringField('Credits', render_kw={'readonly': True})
     department = StringField('Department', render_kw={'readonly': True})
-    training_company = StringField('training_company', render_kw={'readonly': True})
-    description = TextAreaField('description:', render_kw={'readonly': True})
+    training_company = StringField('Training Company', render_kw={'readonly': True})
+    description = TextAreaField('Description:', render_kw={'readonly': True})
 
     comment = TextAreaField('Your Comment:', validators=[InputRequired(), Length(max=500)])
     approved = BooleanField('Approve')
@@ -132,7 +132,7 @@ class EmailForm(FlaskForm):
 class ResetForm(FlaskForm):
     password = PasswordField('New Password', validators=[InputRequired(), Length(min=8, max=80),
                                                          EqualTo('confirm', message='Passwords must match')])
-    confirm = PasswordField('Confirm password', validators=[InputRequired(), Length(min=8, max=80)])
+    confirm = PasswordField('Confirm Password', validators=[InputRequired(), Length(min=8, max=80)])
 
     def validate_password(self, password):
         password_validation(password.data)
