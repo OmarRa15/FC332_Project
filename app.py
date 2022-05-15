@@ -101,6 +101,11 @@ def advLogin():
     if form.validate_on_submit():
         user = Advisor.query.filter_by(email=form.email.data.lower()).first()
 
+        if not user.is_confirmed:
+            return '<h1 style= "text-align: center">Your Email hasn\'t been confirmed yet,' \
+                   '\nPlease <a href="{}">click here</a> to confirm your email <h1>' \
+                .format(url_for('send_confirmation', email=user.email, _external=True))
+
         login_user(user, remember=form.remember.data)
         return redirect(url_for('advisor'))
 
@@ -204,22 +209,6 @@ def student():
 
     return render_template('student-dashboard.html', image=current_user.image, name=name, email=email,
                            application=application)
-
-
-@app.route('/searchStudent')
-@login_required
-def searchStudent():
-    if current_user.type_ != 'advisor':
-        return abort(403)
-
-    args = request.args
-    student_name = args.get('name', default='')
-
-    # A vulnerable Query:
-    result = db.session.execute(
-        f"SELECT * FROM student_view WHERE first_name= :name;", {'name': student_name}).all()
-
-    return render_template('search-Result.html', result=result)
 
 
 @app.route('/apply', methods=['GET', 'POST'])
@@ -353,6 +342,22 @@ def searchAdvisor():
     return render_template('search-Result.html', result=result)
 
 
+@app.route('/searchStudent')
+@login_required
+def searchStudent():
+    if current_user.type_ != 'advisor':
+        return abort(403)
+
+    args = request.args
+    student_name = args.get('name', default='')
+
+    # A vulnerable Query:
+    result = db.session.execute(
+        f"SELECT * FROM student_view WHERE first_name= :name;", {'name': student_name}).all()
+
+    return render_template('search-Result.html', result=result)
+
+
 @app.route('/administrator')
 @login_required
 def administrator():
@@ -381,10 +386,8 @@ def addAdvisor():
         password = form.password.data
         hashedPass = generate_password_hash(password, method='sha256')
 
-        newUser = Advisor(first_name=form.first_name.data, last_name=form.last_name.data, password=hashedPass,
-                          email=form.email.data.lower())
-
-        db.session.add(newUser)
+        db.session.execute(
+            f"CALL addAdvisor('{form.first_name.data}','{form.last_name.data}','{hashedPass}','{form.email.data}');")
         db.session.commit()
 
         return redirect(url_for('administrator'))
