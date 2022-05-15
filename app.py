@@ -351,7 +351,6 @@ def searchStudent():
     args = request.args
     student_name = args.get('name', default='')
 
-    # A vulnerable Query:
     result = db.session.execute(
         f"SELECT * FROM student_view WHERE first_name= :name;", {'name': student_name}).all()
 
